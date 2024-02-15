@@ -37,8 +37,11 @@ pub fn App() -> impl IntoView {
 #[island]
 fn HomePage() -> impl IntoView {
     let resource = create_resource(|| (), |()| async move { get_data().await });
-    let data =
-        Signal::derive(move || resource().map_or(Vec::new(), |data| data.unwrap_or_default()));
+    let data = Signal::derive(move || {
+        resource
+            .get()
+            .map_or(Vec::new(), |data| data.unwrap_or_default())
+    });
     // Creates a reactive value to update the button
     let (count, set_count) = create_signal(0);
     let on_click = move |_| set_count.update(|count| *count += 1);
