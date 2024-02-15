@@ -10,6 +10,8 @@ pub fn hydrate() {
     // initializes logging using the `log` crate
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
+    // Provides Query Client for entire app.
+    leptos_query::provide_query_client();
 
     leptos_dom::HydrationCtx::stop_hydrating();
 }
