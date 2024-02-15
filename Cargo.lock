@@ -1249,9 +1249,9 @@ dependencies = [
 
 [[package]]
 name = "leptos-chartistry"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b30b4903c6aaddbea8f8125055b590e659d8b4a551dab9dc8ed1e1fa1afac71d"
+checksum = "4ada2b792954422d5464f8fc8c9b8778cab8dae316904e96abdfe8a6422bcc2d"
 dependencies = [
  "chrono",
  "leptos",
