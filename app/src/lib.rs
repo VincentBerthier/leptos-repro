@@ -1,6 +1,7 @@
 use crate::error_template::{AppError, ErrorTemplate};
 
 use leptos::*;
+use leptos_chartistry::{AspectRatio, Chart, Line, Series, Tooltip};
 use leptos_meta::*;
 use leptos_router::*;
 
@@ -12,7 +13,7 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/start-axum-islands-workspace.css"/>
+        <Stylesheet id="leptos" href="/pkg/leptos.css"/>
 
         // sets the document title
         <Title text="Welcome to Leptos"/>
@@ -35,12 +36,37 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[island]
 fn HomePage() -> impl IntoView {
+    let resource = create_resource(|| (), |()| async move { get_data().await });
+    let data =
+        Signal::derive(move || resource().map_or(Vec::new(), |data| data.unwrap_or_default()));
     // Creates a reactive value to update the button
     let (count, set_count) = create_signal(0);
     let on_click = move |_| set_count.update(|count| *count += 1);
 
+    let series = Series::new(|(x, _)| *x).line(Line::new(|(_, y)| *y));
+    let plot = Signal::derive(move || {
+        let series = series.clone();
+        view! {
+        <Chart
+            aspect_ratio=AspectRatio::from_outer_ratio(300., 120.)
+            series
+            data
+            tooltip=Tooltip::left_cursor()
+        />
+        }
+    });
+
     view! {
         <h1>"Welcome to Leptos!"</h1>
         <button on:click=on_click>"Click Me: " {count}</button>
+
+        <Transition fallback=move || view! { <p>"Loading plot data"</p> }>
+        {plot}
+        </Transition>
     }
+}
+
+#[server(GetPlotData, "/api")]
+pub async fn get_data() -> Result<Vec<(f64, f64)>, ServerFnError> {
+    Ok(vec![(0., 0.), (1., 1.), (2., 2.), (3., 3.), (4., 4.)])
 }

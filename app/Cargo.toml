@@ -7,9 +7,11 @@ edition = "2021"
 
 [dependencies]
 leptos.workspace = true
+leptos-chartistry.workspace = true
 leptos_meta.workspace = true
 leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
+leptos-use.workspace = true
 
 http.workspace = true
 thiserror.workspace = true
@@ -17,5 +19,5 @@ thiserror.workspace = true
 [features]
 default = []
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"]
+ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum", "leptos-use/ssr"]
 
