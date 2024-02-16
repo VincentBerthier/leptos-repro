@@ -13,18 +13,12 @@ leptos = { version = "0.6", features = ["experimental-islands"] }
 leptos_meta = { version = "0.6", features = [] }
 leptos_router = { version = "0.6", features = [] }
 leptos_axum = { version = "0.6", features = ["experimental-islands"] }
-leptos_i18n = { version = "0.3.2", features = ["experimental-islands"] }
-leptos-chartistry = { git = "https://github.com/feral-dot-io/leptos-chartistry.git" }
-leptos-use = "0.10.0"
 
 axum = {version = "0.7", features = ["macros"] }
-chrono = "0.4.31"
-coingecko = "1.0.1"
 console_error_panic_hook = "0.1.7"
 console_log = "1"
 http = "1"
 log = "0.4.20"
-serde = { version = "1.0.195", features = ["derive"] }
 simple_logger = "4.2.0"
 thiserror = "1"
 tokio = { version = "1.33.0", features = ["full"] }
