@@ -62,9 +62,40 @@ fn HomePage() -> impl IntoView {
         || (),
         |()| async move { get_data().await.map_or_else(|_| Vec::new(), |data| data) },
     );
+    provide_context(data);
     // Creates a reactive value to update the button
     let (count, set_count) = create_signal(0);
     let on_click = move |_| set_count.update(|count| *count += 1);
+
+    view! {
+        <button on:click=on_click>{t!(i18n, click_me, count)}</button>
+        <Price/>
+        <Plot/>
+    }
+}
+
+#[island]
+fn Price() -> impl IntoView {
+    let data = use_context::<Resource<(), Vec<TimePoint>>>();
+    let price = move || {
+        let price = data.map_or(-1., |history| {
+            history.get().map_or(-1.0, |history| {
+                history.last().map_or(-1.0, |price| price.price)
+            })
+        });
+        price
+    };
+
+    view! {
+        <Transition fallback=move || "~~">
+            <p class="inline-block align-middle">{move || price()} " €"</p>
+        </Transition>
+    }
+}
+
+#[island]
+fn Plot() -> impl IntoView {
+    let data = use_context::<Resource<(), Vec<TimePoint>>>().expect("data context");
 
     let series = Series::new(|data: &TimePoint| cast_date(data.time))
         .line(Line::new(|data: &TimePoint| data.price).with_gradient(GRADIENT));
@@ -73,7 +104,6 @@ fn HomePage() -> impl IntoView {
     let tooltip = Tooltip::left_cursor().with_class("bg-background-1 text-white rounded-xl");
 
     view! {
-        <button on:click=on_click>{t!(i18n, click_me, count)}</button>
         <Transition fallback=|| view! { <p>"loading data"</p> }>
             <Chart
                 aspect_ratio=AspectRatio::from_outer_ratio(600., 240.)
