@@ -1,0 +1,21 @@
+[[language]]
+name = "rust"
+language-servers = [ "rust-analyzer", "tailwindcss-ls" ]
+formatter = { command = "leptosfmt", args = ["--stdin", "--rustfmt"] }
+
+
+[[language]]
+name = "html"
+language-servers = [ "vscode-html-language-server", "emmet-ls", "tailwindcss-ls" ]
+
+[[language]]
+name = "css"
+language-servers = [ "vscode-css-language-server", "emmet-ls", "tailwindcss-ls" ]
+
+[language-server.rust-analyzer]
+# config = { procMacro = { ignore = { leptos_macro = [ "server"] } }, cargo = { features = ["ssr", "hydrate"] } }
+config = { cargo = { features = ["ssr", "hydrate"] } }
+check = { command = "clippy", args = ["-F ssr,hydrate", "--all-targets" ] }
+
+[language-server.tailwindcss-ls]
+config = { userLanguages = { rust = "html", "*.rs" = "html" } }

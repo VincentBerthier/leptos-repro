@@ -14,9 +14,12 @@ leptos_axum = { workspace = true, optional = true }
 leptos_i18n.workspace = true
 leptos-use.workspace = true
 
+chrono.workspace = true
+coingecko = { workspace = true, optional = true }
 http.workspace = true
+serde.workspace = true
 thiserror.workspace = true
-# wasm-bindgen = { workspace = true, optional = true }  # uncomment to fix
+wasm-bindgen = { workspace = true, optional = true }  # uncomment to fix
 
 [features]
 default = []
@@ -32,8 +35,9 @@ ssr = [
   "leptos_meta/ssr",
   "leptos_router/ssr",
   "dep:leptos_axum",
-  "leptos_i18n/ssr",
-  "leptos_use/ssr"
+  "leptos_i18n/axum",
+  "leptos-use/ssr",
+  "dep:coingecko",
 ]
 
 [package.metadata.leptos-i18n]

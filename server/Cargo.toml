@@ -9,10 +9,12 @@ edition = "2021"
 app = { path = "../app", default-features = false, features = ["ssr"] }
 leptos = { workspace = true, features = [ "ssr" ]}
 leptos_axum.workspace = true
+leptos_router.workspace = true
 
 axum.workspace = true
+http.workspace = true
+log.workspace = true
 simple_logger.workspace = true
 tokio.workspace = true
-tower.workspace = true
 tower-http.workspace = true
-log.workspace = true
+tower.workspace = true

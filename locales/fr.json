@@ -1,3 +1,5 @@
 {
-  "click_me": "Clic Moi : {{ count }}"
+  "click_me": "Clic Moi : {{ count }}",
+  "home": "Accueil",
+  "other": "Autre"
 }

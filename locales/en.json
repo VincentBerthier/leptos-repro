@@ -1,3 +1,5 @@
 { 
-  "click_me": "Click Me: {{ count }}"
+  "click_me": "Click Me: {{ count }}",
+  "home": "Home",
+  "other": "Other"
 }
