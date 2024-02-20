@@ -35,22 +35,29 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[island]
 fn HomePage() -> impl IntoView {
-    let data = create_resource(
-        || (),
-        |()| async move { get_data().await.map_or(Vec::new(), |data| data) },
-    );
-    provide_context(data);
     // Creates a reactive value to update the button
     let (count, set_count) = create_signal(0);
     let on_click = move |_| set_count.update(|count| *count += 1);
 
     view! {
         <button on:click=on_click>"Click me: " {count}</button>
-        <LastValue/>
+        <ContextIsland>
+            <LastValue/>
+        </ContextIsland>
     }
 }
 
 #[island]
+fn ContextIsland(children: Children) -> impl IntoView {
+    let data = create_resource(
+        || (),
+        |()| async move { get_data().await.unwrap_or(Vec::new()) },
+    );
+    provide_context(data);
+    children()
+}
+
+#[component]
 fn LastValue() -> impl IntoView {
     let resource = use_context::<Resource<(), Vec<f64>>>();
     let value = move || {
