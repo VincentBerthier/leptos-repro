@@ -7,6 +7,7 @@ use leptos_meta::*;
 use leptos_query::{
     create_query, use_query, QueryOptions, QueryResult, QueryScope, RefetchFn, ResourceOption,
 };
+use leptos_query_devtools::LeptosQueryDevtools;
 use leptos_router::*;
 use tracing::{debug, instrument, Instrument};
 
@@ -25,6 +26,7 @@ pub fn App() -> impl IntoView {
         // sets the document title
         <Title text="Welcome to Leptos"/>
 
+        <LeptosQueryDevtools/>
         // content for this welcome page
         <Router fallback=|| {
             let mut outside_errors = Errors::default();
