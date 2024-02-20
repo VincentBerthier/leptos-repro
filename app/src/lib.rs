@@ -4,7 +4,9 @@ use crate::error_template::{AppError, ErrorTemplate};
 
 use leptos::*;
 use leptos_meta::*;
-use leptos_query::{use_query, QueryOptions, QueryResult, RefetchFn, ResourceOption};
+use leptos_query::{
+    create_query, use_query, QueryOptions, QueryResult, QueryScope, RefetchFn, ResourceOption,
+};
 use leptos_router::*;
 use tracing::{debug, instrument, Instrument};
 
@@ -39,15 +41,15 @@ pub fn App() -> impl IntoView {
 }
 
 /// Renders the home page of your application.
-#[island]
+#[component]
 fn HomePage() -> impl IntoView {
-    let QueryResult { data, .. } = data_query();
+    let QueryResult { data, .. } = data_query().use_query(|| ());
     // Creates a reactive value to update the button
     let (count, set_count) = create_signal(0);
     let on_click = move |_| set_count.update(|count| *count += 1);
 
     let points = move || {
-        data().map(|data| {
+        data.get().map(|data| {
             view! {
                 <For each=move || data.clone().into_iter().enumerate() key=move |(i, _)| *i let:point>
                     <p>"Point at {" {point.1.0} "," {point.1.1} "}"</p>
@@ -73,10 +75,9 @@ pub async fn get_data() -> Result<Vec<(f64, f64)>, ServerFnError> {
 }
 
 #[instrument]
-pub fn data_query() -> QueryResult<Vec<(f64, f64)>, impl RefetchFn> {
-    use_query(
-        || (),
-        |()| {
+pub fn data_query() -> QueryScope<(), Vec<(f64, f64)>> {
+    create_query(
+        |_| {
             async move {
                 debug!("querying data");
                 get_data().await.unwrap_or_default()
@@ -84,11 +85,9 @@ pub fn data_query() -> QueryResult<Vec<(f64, f64)>, impl RefetchFn> {
             .in_current_span()
         },
         QueryOptions {
-            default_value: None,
             stale_time: Some(Duration::from_secs(30)),
-            cache_time: Some(Duration::from_secs(60)),
-            refetch_interval: None,
-            resource_option: ResourceOption::NonBlocking,
+            gc_time: Some(Duration::from_secs(60)),
+            ..Default::default()
         },
     )
 }
