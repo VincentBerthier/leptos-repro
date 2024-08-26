@@ -44,6 +44,10 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("users/:id") view=User/>
                     <Route path=path!("stories/:id") view=Story/>
                     <Route path=path!("stories") view=Stories/>
+                    // Test parent route
+                    <ParentRoute path=path!("help") view=|| view! { <p>"Help page"</p><Outlet/> }>
+                        <Route path=path!("about") view=|| view! { <p>"About sub page"</p> }/>
+                    </ParentRoute>
                     // TODO allow optional params without duplication
                     <Route path=path!("") view=Stories/>
                 </Routes>
