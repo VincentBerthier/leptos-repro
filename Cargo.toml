@@ -12,10 +12,10 @@ lto = true
 
 [dependencies]
 console_error_panic_hook = "0.1.7"
-leptos = { git = "https://github.com/leptos-rs/leptos", features = ["experimental-islands"] }
-leptos_axum = { git = "https://github.com/leptos-rs/leptos", optional = true }
-leptos_meta = { git = "https://github.com/leptos-rs/leptos" }
-leptos_router = { git = "https://github.com/leptos-rs/leptos" }
+leptos = { version = "0.7.0-beta4", features = ["experimental-islands"] }
+leptos_axum = { version = "0.7.0-beta4", optional = true }
+leptos_meta = { version = "0.7.0-beta4" }
+leptos_router = { version = "0.7.0-beta4" }
 serde = { version = "1.0", features = ["derive"] }
 tracing = "0.1.40"
 gloo-net = { version = "0.6.0", features = ["http"] }
