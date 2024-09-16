@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 mod api;
+mod dummy;
 mod routes;
 use leptos_meta::{provide_meta_context, Link, Meta, MetaTags, Stylesheet};
 use leptos_router::{
@@ -7,6 +8,7 @@ use leptos_router::{
     path, SsrMode,
 };
 use routes::{nav::*, stories::*, story::*, users::*};
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
 pub mod fallback;
 
@@ -100,96 +102,58 @@ fn IslandRoutes() -> impl IntoView {
 #[component]
 fn TestingComponent() -> impl IntoView {
     view! {
-        <ResourceInComponent/>
-        <ResourceInIsland/>
-        <BlockingResourceInIsland/>
+        <Slider initial_position=SliderPosition::Off style=String::new()>
+            <DisplaySlider />
+        </Slider>
     }
 }
-
-// Works as expected
-#[component]
-fn ResourceInComponent() -> impl IntoView {
-    let param = RwSignal::new(123_u8);
-    let resource = Resource::new(
-        move || param.get(),
-        move |param| async move { get_data(param).await },
-    );
-
-    view! {
-        <Suspense>
-            <p>"There are " {move || Suspend::new(async move { resource.await.unwrap_or_default().len() })} " data elements in the compoment"</p>
-        </Suspense>
-    }
-}
-
-// Somehow, this writes "There are 123123 data elements in the island"
-#[island]
-fn ResourceInIsland() -> impl IntoView {
-    let param = RwSignal::new(123_u8);
-    let resource = Resource::new(
-        move || param.get(),
-        move |param| async move { get_data(param).await },
-    );
-
-    view! {
-        <Suspense>
-            <p>"There are " {move || Suspend::new(async move { resource.await.unwrap_or_default().len() })} " data elements in the island"</p>
-        </Suspense>
-    }
-}
-
-// Somehow, this writes "There are 123123 data elements in the island"
-#[island]
-fn BlockingResourceInIsland() -> impl IntoView {
-    let param = RwSignal::new(123_u8);
-    let resource = Resource::new_blocking(
-        move || param.get(),
-        move |param| async move { get_data(param).await },
-    );
-
-    view! {
-        <Suspense>
-            <p>"There are " {move || Suspend::new(async move { resource.await.unwrap_or_default().len() })} " data elements in the island"</p>
-        </Suspense>
-    }
-}
-
-// Server panics when loading the page:
-// thread 'tokio-runtime-worker' panicked at /home/vincent/.cargo/registry/src/index.crates.io-6f17d22bba15001f/reactive_graph-0.1.0-beta4/src/owner/stored_value.rs:132:34:
-// Dereferenced SendWrapper<T> variable from a thread different to the one it has been created with.
-// #[island]
-// fn LocalResourceInIsland() -> impl IntoView {
-//     let param = RwSignal::new(123_u8);
-//     let resource = LocalResource::new(move || async move { get_data(param.get()).await });
-//
-//     view! {
-//         <Suspense>
-//             <p>"There are " {move || Suspend::new(async move { resource.await.unwrap_or_default().len() })} " data elements in the island"</p>
-//         </Suspense>
-//     }
-// }
-
-// Panics in the client (unwrap on a none value) + Runtime unreachable
-// #[island]
-// fn ArcLocalResourceInIsland() -> impl IntoView {
-//     let param = RwSignal::new(123_u8);
-//     let resource = ArcLocalResource::new(move || async move { get_data(param.get()).await });
-
-//     let suspend = move || {
-//         let resource = resource.clone();
-//         Suspend::new(async move { resource.await.unwrap_or_default().len() })
-//     };
-
-//     view! {
-//         <Suspense>
-//             <p>"There are " {suspend} " data elements in the island"</p>
-//         </Suspense>
-//     }
-// }
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
     console_error_panic_hook::set_once();
     leptos::mount::hydrate_islands();
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+pub enum SliderPosition {
+    On,
+    Off,
+}
+
+#[island]
+pub fn Slider(
+    initial_position: SliderPosition,
+    style: String,
+    children: Children,
+) -> impl IntoView {
+    let pos = RwSignal::new(initial_position);
+    provide_context(pos);
+
+    let change = move |_ev| match pos.get() {
+        SliderPosition::On => *pos.write() = SliderPosition::Off,
+        SliderPosition::Off => *pos.write() = SliderPosition::On,
+    };
+
+    view! {
+        <div style=style>
+            <label class="switch">
+                <input type="checkbox" on:change=change />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        {children()}
+    }
+}
+#[island]
+pub fn DisplaySlider() -> impl IntoView {
+    let slider = expect_context::<RwSignal<SliderPosition>>();
+    let pos = move || {
+        if slider.read() == SliderPosition::On {
+            "On"
+        } else {
+            "Off"
+        }
+    };
+    view! { <p>"Slider is in position " {pos}</p> }
 }

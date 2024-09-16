@@ -1,30 +1,45 @@
 use leptos::prelude::*;
 use leptos_router::components::A;
 
-#[component]
+#[island]
 pub fn Nav() -> impl IntoView {
+    let permission = expect_context::<Resource<bool>>();
     view! {
         <header class="header">
             <nav class="inner">
-                <A href="/home">
+                <a href="/home">
                     <strong>"HN"</strong>
-                </A>
-                <A href="/new">
+                </a>
+                <a href="/new">
                     <strong>"New"</strong>
-                </A>
-                <A href="/show">
+                </a>
+                <a href="/show">
                     <strong>"Show"</strong>
-                </A>
-                <A href="/ask">
+                </a>
+                <a href="/ask">
                     <strong>"Ask"</strong>
-                </A>
-                <A href="/job">
+                </a>
+                <a href="/job">
                     <strong>"Jobs"</strong>
-                </A>
+                </a>
+                <Suspense>
+                    <Show when=move || permission.get().unwrap_or(false) fallback=|| view! { <a href="#">"loading"</a> }>
+                    <InnerNav/>
+                    </Show>
+                </Suspense>
                 <a class="github" href="http://github.com/leptos-rs/leptos" target="_blank" rel="noreferrer">
                     "Built with Leptos"
                 </a>
             </nav>
         </header>
+    }
+}
+
+#[island]
+fn InnerNav() -> impl IntoView {
+    let value = RwSignal::new(false);
+
+    view! {
+        <button on:click=move |_ev| value.update(|val| *val = !*val)>{value}</button>
     }
 }
